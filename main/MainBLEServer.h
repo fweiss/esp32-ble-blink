@@ -13,9 +13,12 @@ static char LOG_TAG[] = "SampleServer";
 
 class HeartRateCallbacks : public BLECharacteristicCallbacks {
     virtual void onWrite(BLECharacteristic* characteristic) override {
-        ESP_LOGI(LOG_TAG, "set heart rate");
-        const char* value = characteristic->getValue().c_str();
-        ESP_LOGI(LOG_TAG, "%s", value);
+//        const char* value = characteristic->getValue().c_str();
+//        ESP_LOGI(LOG_TAG, "set heart rate: %s", value);
+
+        // convert first octet to int, kind of a kludge
+        int value = characteristic->getValue()[0];
+        ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
     }
 };
 
