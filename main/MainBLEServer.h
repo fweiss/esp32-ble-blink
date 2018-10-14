@@ -33,6 +33,7 @@ class MainBLEServer: public Task {
         ESP_LOGD(LOG_TAG, "Starting BLE work!");
 
         blink = new FlashingIndicator((gpio_num_t) 13);
+        blink->setBeatsPerMinute(120);
         blink->start();
 
         BLEDevice::init("ESP32");

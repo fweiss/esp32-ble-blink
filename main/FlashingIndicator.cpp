@@ -13,9 +13,14 @@ FlashingIndicator::FlashingIndicator(gpio_num_t pin) {
 
 void FlashingIndicator::run(void* data) {
     while (true) {
+        unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
         gpio_set_level(pin, 0);
-        vTaskDelay(200 / portTICK_PERIOD_MS);
+        vTaskDelay(offPeriodMillis / portTICK_PERIOD_MS);
         gpio_set_level(pin, 1);
-        vTaskDelay(200 / portTICK_PERIOD_MS);
+        vTaskDelay(onPeriodMillis / portTICK_PERIOD_MS);
     }
+}
+
+void FlashingIndicator::setBeatsPerMinute(unsigned int bpm) {
+    this->beatsPerMinute = bpm;
 }
