@@ -43,7 +43,7 @@ void blink_task(void *pvParameter)
 extern "C" void app_main()
 {
     ESP_LOGI("appzz", "starting blink task");
-    xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
+//    xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
 
     //esp_log_level_set("*", ESP_LOG_DEBUG);
     MainBLEServer* pMainBleServer = new MainBLEServer();

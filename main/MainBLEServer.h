@@ -6,6 +6,7 @@
 #include <string>
 #include <Task.h>
 
+#include "FlashingIndicator.h"
 
 #include "sdkconfig.h"
 
@@ -23,11 +24,16 @@ class HeartRateCallbacks : public BLECharacteristicCallbacks {
 };
 
 class MainBLEServer: public Task {
+    FlashingIndicator* blink;
+
 //    const char* characteristicUUID = "0d563a58-196a-48ce-ace2-dfec78acc814";
     const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
     const uint8_t batteryVoltagePin = 13; // A13
     void run(void *data) {
         ESP_LOGD(LOG_TAG, "Starting BLE work!");
+
+        blink = new FlashingIndicator((gpio_num_t) 13);
+        blink->start();
 
         BLEDevice::init("ESP32");
         BLEServer* pServer = BLEDevice::createServer();
