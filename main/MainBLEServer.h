@@ -12,18 +12,24 @@
 
 static char LOG_TAG[] = "SampleServer";
 
-class HeartRateCallbacks : public BLECharacteristicCallbacks {
-    virtual void onWrite(BLECharacteristic* characteristic) override {
-//        const char* value = characteristic->getValue().c_str();
-//        ESP_LOGI(LOG_TAG, "set heart rate: %s", value);
-
-        // convert first octet to int, kind of a kludge
-        int value = characteristic->getValue()[0];
-        ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
-    }
-};
 
 class MainBLEServer: public Task {
+    class HeartRateCallbacks : public BLECharacteristicCallbacks {
+    public:
+        FlashingIndicator* blinker;
+        HeartRateCallbacks(FlashingIndicator* blinker) {
+            this->blinker = blinker;
+        }
+        virtual void onWrite(BLECharacteristic* characteristic) override {
+    //        const char* value = characteristic->getValue().c_str();
+    //        ESP_LOGI(LOG_TAG, "set heart rate: %s", value);
+
+            // convert first octet to int, kind of a kludge
+            int value = characteristic->getValue()[0];
+            ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
+            blinker->setBeatsPerMinute(value);
+        }
+    };
     FlashingIndicator* blink;
 
 //    const char* characteristicUUID = "0d563a58-196a-48ce-ace2-dfec78acc814";
@@ -76,7 +82,7 @@ class MainBLEServer: public Task {
             BLECharacteristic::PROPERTY_INDICATE
         );
 
-        pCharacteristic->setCallbacks(new HeartRateCallbacks());
+        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink));
 
         uint8_t heartRate = 61;
         pCharacteristic->setValue(&heartRate, sizeof(heartRate));
