@@ -7,6 +7,7 @@
 #include <Task.h>
 
 #include "FlashingIndicator.h"
+#include "BatteryLevel.h"
 
 #include "sdkconfig.h"
 
@@ -17,8 +18,11 @@ class MainBLEServer: public Task {
     class HeartRateCallbacks : public BLECharacteristicCallbacks {
     public:
         FlashingIndicator* blinker;
-        HeartRateCallbacks(FlashingIndicator* blinker) {
+        BatteryLevel* battery;
+
+        HeartRateCallbacks(FlashingIndicator* blinker, BatteryLevel* battery) {
             this->blinker = blinker;
+            this->battery = battery;
         }
         virtual void onWrite(BLECharacteristic* characteristic) override {
     //        const char* value = characteristic->getValue().c_str();
@@ -29,8 +33,26 @@ class MainBLEServer: public Task {
             ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
             blinker->setBeatsPerMinute(value);
         }
+//        virtual void onRead(BLECharacteristic* characteristic) override {
+//            int value = battery->getCurrentLevel();
+//            characteristic->setValue(value);
+//            ESP_LOGI(LOG_TAG, "battery level: %d", value);
+//         }
+    };
+    class BatteryCallbacks : public BLECharacteristicCallbacks {
+    public:
+        BatteryLevel* battery;
+        BatteryCallbacks(BatteryLevel* battery) {
+            this->battery = battery;
+        }
+        virtual void onRead(BLECharacteristic* characteristic) override {
+            int value = battery->getCurrentLevel();
+            characteristic->setValue(value);
+            ESP_LOGI(LOG_TAG, "battery level: %d", value);
+        }
     };
     FlashingIndicator* blink;
+    BatteryLevel* battery;
 
 //    const char* characteristicUUID = "0d563a58-196a-48ce-ace2-dfec78acc814";
     const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
@@ -41,6 +63,8 @@ class MainBLEServer: public Task {
         blink = new FlashingIndicator((gpio_num_t) 13);
         blink->setBeatsPerMinute(120);
         blink->start();
+
+        battery = new BatteryLevel();
 
         BLEDevice::init("ESP32");
         BLEServer* pServer = BLEDevice::createServer();
@@ -55,8 +79,9 @@ class MainBLEServer: public Task {
         );
 
 //        pCharacteristic->setValue("Hello World!");
-        uint8_t batteryLevel = 57;
+        uint8_t batteryLevel = battery->getCurrentLevel(); //57;
         pCharacteristic->setValue(&batteryLevel, sizeof(batteryLevel));
+        pCharacteristic->setCallbacks(new BatteryCallbacks(battery));
 
         BLE2902* p2902Descriptor = new BLE2902();
         p2902Descriptor->setNotifications(true);
@@ -71,6 +96,7 @@ class MainBLEServer: public Task {
         pAdvertising->start();
 
         ESP_LOGD(LOG_TAG, "Advertising started!");
+        // todo find a better way to suspend here
         delay(1000000);
     }
     void createHeartRateCharacteristic(BLEService* service) {
@@ -82,7 +108,7 @@ class MainBLEServer: public Task {
             BLECharacteristic::PROPERTY_INDICATE
         );
 
-        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink));
+        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink, battery));
 
         uint8_t heartRate = 61;
         pCharacteristic->setValue(&heartRate, sizeof(heartRate));
