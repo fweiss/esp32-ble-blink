@@ -37,8 +37,9 @@ class MainBLEServer: public Task {
             this->battery = battery;
         }
         virtual void onRead(BLECharacteristic* characteristic) override {
-            int value = battery->getCurrentLevel();
-            characteristic->setValue(value);
+//            int value = battery->getCurrentLevel();
+            uint8_t value = battery->toPercent(battery->getCurrentLevel());
+            characteristic->setValue(&value, 1);
             ESP_LOGI(LOG_TAG, "battery level: %d", value);
         }
     };

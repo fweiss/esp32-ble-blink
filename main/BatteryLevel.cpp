@@ -27,3 +27,11 @@ int BatteryLevel::getCurrentLevel() {
 //        return 2.2*(float)(battery_voltage)/0xFFF;
     }
 }
+
+uint8_t BatteryLevel::toPercent(int raw) {
+    // based on empirical data
+    const float base = 0.69;
+    const float slope = 0.0015;
+    const float range = 4.236;
+    return (base + raw * slope) / range * 100;
+}
