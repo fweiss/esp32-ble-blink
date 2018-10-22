@@ -20,9 +20,8 @@ class MainBLEServer: public Task {
         FlashingIndicator* blinker;
         BatteryLevel* battery;
 
-        HeartRateCallbacks(FlashingIndicator* blinker, BatteryLevel* battery) {
+        HeartRateCallbacks(FlashingIndicator* blinker) {
             this->blinker = blinker;
-            this->battery = battery;
         }
         virtual void onWrite(BLECharacteristic* characteristic) override {
             // convert first octet to int, kind of a kludge
@@ -98,7 +97,7 @@ class MainBLEServer: public Task {
             BLECharacteristic::PROPERTY_INDICATE
         );
 
-        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink, battery));
+        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink));
 
         uint8_t heartRate = 61;
         pCharacteristic->setValue(&heartRate, sizeof(heartRate));
