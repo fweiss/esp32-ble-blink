@@ -25,19 +25,11 @@ class MainBLEServer: public Task {
             this->battery = battery;
         }
         virtual void onWrite(BLECharacteristic* characteristic) override {
-    //        const char* value = characteristic->getValue().c_str();
-    //        ESP_LOGI(LOG_TAG, "set heart rate: %s", value);
-
             // convert first octet to int, kind of a kludge
             int value = characteristic->getValue()[0];
             ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
             blinker->setBeatsPerMinute(value);
         }
-//        virtual void onRead(BLECharacteristic* characteristic) override {
-//            int value = battery->getCurrentLevel();
-//            characteristic->setValue(value);
-//            ESP_LOGI(LOG_TAG, "battery level: %d", value);
-//         }
     };
     class BatteryCallbacks : public BLECharacteristicCallbacks {
     public:
@@ -54,7 +46,6 @@ class MainBLEServer: public Task {
     FlashingIndicator* blink;
     BatteryLevel* battery;
 
-//    const char* characteristicUUID = "0d563a58-196a-48ce-ace2-dfec78acc814";
     const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
     const uint8_t batteryVoltagePin = 13; // A13
     void run(void *data) {
@@ -78,7 +69,6 @@ class MainBLEServer: public Task {
             BLECharacteristic::PROPERTY_INDICATE
         );
 
-//        pCharacteristic->setValue("Hello World!");
         uint8_t batteryLevel = battery->getCurrentLevel(); //57;
         pCharacteristic->setValue(&batteryLevel, sizeof(batteryLevel));
         pCharacteristic->setCallbacks(new BatteryCallbacks(battery));
@@ -112,6 +102,5 @@ class MainBLEServer: public Task {
 
         uint8_t heartRate = 61;
         pCharacteristic->setValue(&heartRate, sizeof(heartRate));
-
     }
 };
