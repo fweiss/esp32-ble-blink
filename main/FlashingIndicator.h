@@ -14,4 +14,6 @@ public:
     void setBeatsPerMinute(unsigned int bpm);
 
     virtual void run(void* data) override;
+protected:
+    void stateForNextMillis(bool onOff, unsigned long millis);
 };
