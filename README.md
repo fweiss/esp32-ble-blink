@@ -5,7 +5,16 @@ This project is an example of using Bluetooth with an ESP32 MCU.
 - esp-idf toolchain
 - Adafruit HUZZAH32 Feather board
 - Neil Kolban BLE library
-- Nordic nRF Connect
+- Nordic nRF Connect client
+
+## Concept
+Communicate with the ESP32 MCU via Bluetooth. 
+Keep it simple with the following MVP:
+
+- adjust the blink of the onboard user LED
+- read the charge level of the attached LiPo battery
+- try to use existing GATT profiles
+- use the Nordic nRF Connect Bluetooth client for Android
 
 ## Kolban BLE integration
 Neil Kolban has developed an object-oriented wrapper for the esp-idf Bluetooth API.
