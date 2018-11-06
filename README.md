@@ -1,36 +1,23 @@
-# Blink Example
+# ESP32 BLE Blink
 
-Starts a FreeRTOS task to blink an LED
+This project is an example of using Bluetooth with an ESP32 MCU.
 
-See the README.md file in the upper level 'examples' directory for more information about examples.
-
-## Measuerements
-battery level 0x2a19, uit8, 0-100, 
-`org.bluetooth.characteristic.battery_level`
-0x27AD	percentage	`org.bluetooth.unit.percentage`
-0x2728	electric potential difference (volt)	`org.bluetooth.unit.electric_potential_difference.volt`
-raw, 11db
-uncharged lipo          1719, 0x06b7, 47%
-and then it ramps up
-partial charge (90 sec) 1911, 0x0777, 119%
-full charge             2363, 0x093b, 59%
-                        2365, 61%
-                        2365, 61%, 4.236 V
-                        2339, 35%, 4.201 V
-                        2268, 220%, 4.075 V
-                        2143, 95%, 3.868 V
-                        after correction
-                        1761, 78%, 3.281 V
-                        1840, 81%, 3.385 V
-
-
+- esp-idf toolchain
+- Adafruit HUZZAH32 Feather board
+- Neil Kolban BLE library
+- Nordic nRF Connect
 
 ## Kolban BLE integration
+Neil Kolban has developed an object-oriented wrapper for the esp-idf Bluetooth API.
+
+https://github.com/nkolban/esp32-snippets
+
+There are several ways to use the library. In this case, the following procedure was used:
 
 - clone the repo
 - create a component folder
 - copy the ccp_utils
-- enable bluetooth and bludroid
+- enable bluetooth and bluedroid
 - rename blink.c to blink.cpp
 - add extern "C" to app_main()
 - edit CMakeLists.txt
