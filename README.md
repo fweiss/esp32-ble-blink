@@ -40,3 +40,25 @@ https://www.bluetooth.com/specifications/gatt/characteristics
 
 https://www.oreilly.com/library/view/getting-started-with/9781491900550/ch04.html
 
+## BLE clients
+Besides writing a custom client, there are many generic clients for testing a BLE server. They are available for either desktop or mobile.
+
+- Nordic Semiconductor nrf Connect
+- Adafruit Bluefruit LE Connect
+- Lightblue
+- Bluesee
+
+Also XCode
+
+### BlueSee
+Available from the Apple App Store. It's free.
+
+- Scans for BT devices
+- Shows device info
+- Shows device connection log
+- write characteristic only hex or ascii
+
+The ESP32 did not show up i scan until I disconnected from the nrf Connect client on Android.
+
+## Notes and references
+It's only possible to connect one client at a time.

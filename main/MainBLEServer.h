@@ -38,34 +38,6 @@ class MainBLEServer: public Task {
         const CharacteristicCallback nullCallback = [](BLECharacteristic*){};
     };
 
-//    class HeartRateCallbacks : public BLECharacteristicCallbacks {
-//    public:
-//        FlashingIndicator* blinker;
-//        BatteryLevel* battery;
-//
-//        HeartRateCallbacks(FlashingIndicator* blinker) {
-//            this->blinker = blinker;
-//        }
-//        virtual void onWrite(BLECharacteristic* characteristic) override {
-//            // convert first octet to int, kind of a kludge
-//            int value = characteristic->getValue()[0];
-//            ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
-//            blinker->setBeatsPerMinute(value);
-//        }
-//    };
-//    class BatteryCallbacks : public BLECharacteristicCallbacks {
-//    public:
-//        BatteryLevel* battery;
-//        BatteryCallbacks(BatteryLevel* battery) {
-//            this->battery = battery;
-//        }
-//        virtual void onRead(BLECharacteristic* characteristic) override {
-////            int value = battery->getCurrentLevel();
-//            uint8_t value = battery->toPercent(battery->getCurrentLevel());
-//            characteristic->setValue(&value, 1);
-//            ESP_LOGI(LOG_TAG, "battery level: %d", value);
-//        }
-//    };
     FlashingIndicator* blink;
     BatteryLevel* battery;
 
@@ -84,21 +56,6 @@ class MainBLEServer: public Task {
         BLEServer* pServer = BLEDevice::createServer();
 
         BLEService* pService = pServer->createService("91bad492-b950-4226-aa2b-4ede9fa42f59");
-
-//        BLECharacteristic* pCharacteristic = pService->createCharacteristic(
-//            BLEUUID(characteristicUUID),
-//            BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
-//            BLECharacteristic::PROPERTY_NOTIFY    | BLECharacteristic::PROPERTY_WRITE |
-//            BLECharacteristic::PROPERTY_INDICATE
-//        );
-//
-//        uint8_t batteryLevel = battery->getCurrentLevel(); //57;
-//        pCharacteristic->setValue(&batteryLevel, sizeof(batteryLevel));
-//        pCharacteristic->setCallbacks(new BatteryCallbacks(battery));
-//
-//        BLE2902* p2902Descriptor = new BLE2902();
-//        p2902Descriptor->setNotifications(true);
-//        pCharacteristic->addDescriptor(p2902Descriptor);
 
         createBatteryLevelCharacteristic(pService);
         createHeartRateCharacteristic(pService);
@@ -124,7 +81,6 @@ class MainBLEServer: public Task {
 
         uint8_t batteryLevel = battery->getCurrentLevel(); //57;
         pCharacteristic->setValue(&batteryLevel, sizeof(batteryLevel));
-//        pCharacteristic->setCallbacks(new BatteryCallbacks(battery));
         pCharacteristic->setCallbacks(createReadCallbacks(
             [this](BLECharacteristic* characteristic) {
                 uint8_t value = battery->toPercent(battery->getCurrentLevel());
@@ -145,7 +101,6 @@ class MainBLEServer: public Task {
             BLECharacteristic::PROPERTY_INDICATE
         );
 
-//        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink));
         pCharacteristic->setCallbacks(createWriteCallbacks(
             [this](BLECharacteristic* characteristic) {
                 int value = characteristic->getValue()[0];
