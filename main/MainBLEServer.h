@@ -11,25 +11,48 @@
 
 #include "sdkconfig.h"
 
+#include <functional>
+
 static char LOG_TAG[] = "SampleServer";
 
+typedef std::function<void(BLECharacteristic*)> CharacteristicCallback;
 
 class MainBLEServer: public Task {
-    class HeartRateCallbacks : public BLECharacteristicCallbacks {
-    public:
-        FlashingIndicator* blinker;
-        BatteryLevel* battery;
 
-        HeartRateCallbacks(FlashingIndicator* blinker) {
-            this->blinker = blinker;
+    class Ch : public BLECharacteristicCallbacks {
+    public:
+        Ch(CharacteristicCallback readCallback, CharacteristicCallback writeCallback) {
+            this->readCallback = readCallback ? readCallback : nullCallback;
+            this->writeCallback = writeCallback ? writeCallback : nullCallback;
         }
-        virtual void onWrite(BLECharacteristic* characteristic) override {
-            // convert first octet to int, kind of a kludge
-            int value = characteristic->getValue()[0];
-            ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
-            blinker->setBeatsPerMinute(value);
+        ~Ch() {}
+        virtual void onWrite(BLECharacteristic* characteristic) {
+            writeCallback(characteristic);
         }
+        virtual void onRead(BLECharacteristic* characteristic) {
+            readCallback(characteristic);
+        }
+    private:
+        std::function<void(BLECharacteristic*)> readCallback;
+        std::function<void(BLECharacteristic*)> writeCallback;
+        const std::function<void(BLECharacteristic*)> nullCallback = [](BLECharacteristic*){};
     };
+
+//    class HeartRateCallbacks : public BLECharacteristicCallbacks {
+//    public:
+//        FlashingIndicator* blinker;
+//        BatteryLevel* battery;
+//
+//        HeartRateCallbacks(FlashingIndicator* blinker) {
+//            this->blinker = blinker;
+//        }
+//        virtual void onWrite(BLECharacteristic* characteristic) override {
+//            // convert first octet to int, kind of a kludge
+//            int value = characteristic->getValue()[0];
+//            ESP_LOGI(LOG_TAG, "set heart rate: %d", value);
+//            blinker->setBeatsPerMinute(value);
+//        }
+//    };
     class BatteryCallbacks : public BLECharacteristicCallbacks {
     public:
         BatteryLevel* battery;
@@ -98,9 +121,21 @@ class MainBLEServer: public Task {
             BLECharacteristic::PROPERTY_INDICATE
         );
 
-        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink));
+//        pCharacteristic->setCallbacks(new HeartRateCallbacks(blink));
+        pCharacteristic->setCallbacks(createWriteCallbacks(
+            [this](BLECharacteristic* characteristic) {
+                int value = characteristic->getValue()[0];
+                ESP_LOGI(LOG_TAG, "setting heart rate: %d", value);
+                blink->setBeatsPerMinute(value);
+        }));
 
         uint8_t heartRate = 61;
         pCharacteristic->setValue(&heartRate, sizeof(heartRate));
+    }
+    BLECharacteristicCallbacks* createReadCallbacks(CharacteristicCallback readCallback) {
+        return new Ch(readCallback, nullptr);
+    }
+    BLECharacteristicCallbacks* createWriteCallbacks(CharacteristicCallback readCallback) {
+        return new Ch(nullptr, readCallback);
     }
 };
