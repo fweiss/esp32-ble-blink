@@ -2,6 +2,7 @@
 #include "BLEServer.h"
 #include "BLEUtils.h"
 #include "BLE2902.h"
+#include "BLE2904.h"
 #include <esp_log.h>
 #include <string>
 #include <Task.h>
@@ -91,6 +92,11 @@ class MainBLEServer: public Task {
         BLE2902* p2902Descriptor = new BLE2902();
         p2902Descriptor->setNotifications(true);
         pCharacteristic->addDescriptor(p2902Descriptor);
+
+        BLEUUID userUUID((uint16_t)0x2901);
+        BLEDescriptor* user = new BLEDescriptor(userUUID);
+        user->setValue("LiPo battery charge\0"); // note explicit null termination
+        pCharacteristic->addDescriptor(user);
     }
     void createHeartRateCharacteristic(BLEService* service) {
         const char* characteristicUUID = "00002A92-0000-1000-8000-00805F9B34FB";
@@ -110,6 +116,12 @@ class MainBLEServer: public Task {
 
         uint8_t heartRate = 61;
         pCharacteristic->setValue(&heartRate, sizeof(heartRate));
+
+        // Characteristic Presentation Format
+        BLE2904* ble2904 = new BLE2904();
+        ble2904->setFormat(BLE2904::FORMAT_UINT8);
+        ble2904->setUnit(0x27af); // bpm
+        pCharacteristic->addDescriptor(ble2904);
     }
     BLECharacteristicCallbacks* createReadCallbacks(CharacteristicCallback readCallback) {
         return new Ch(readCallback, nullptr);
