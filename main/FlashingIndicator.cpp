@@ -14,12 +14,8 @@ FlashingIndicator::FlashingIndicator(gpio_num_t pin) {
 void FlashingIndicator::run(void* data) {
     while (true) {
         // todo switch to vTaskDelayUntil for more accurate timing
-        // reluctant to without a way to test
+        // reluctant to change this without a way to test
         unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
-//        gpio_set_level(pin, 0);
-//        vTaskDelay(offPeriodMillis / portTICK_PERIOD_MS);
-//        gpio_set_level(pin, 1);
-//        vTaskDelay(onPeriodMillis / portTICK_PERIOD_MS);
         stateForNextMillis(true, onPeriodMillis);
         stateForNextMillis(false, offPeriodMillis);
     }

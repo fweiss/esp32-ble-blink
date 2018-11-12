@@ -16,10 +16,16 @@
 
 static char LOG_TAG[] = "SampleServer";
 
+/* Can run 'make menuconfig' to choose the GPIO to blink,
+   or you can edit the following line and set a number here.
+*/
+#define BLINK_GPIO ((gpio_num_t)CONFIG_BLINK_GPIO)
+
 typedef std::function<void(BLECharacteristic*)> CharacteristicCallback;
 
 class MainBLEServer: public Task {
 
+    // helper class extension to support lambda callbacks
     class Ch : public BLECharacteristicCallbacks {
     public:
         Ch(CharacteristicCallback readCallback, CharacteristicCallback writeCallback) {
@@ -43,11 +49,12 @@ class MainBLEServer: public Task {
     BatteryLevel* battery;
 
     const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
-    const uint8_t batteryVoltagePin = 13; // A13
+//    const uint8_t batteryVoltagePin = 13; // A13
+
     void run(void *data) {
         ESP_LOGD(LOG_TAG, "Starting BLE work!");
 
-        blink = new FlashingIndicator((gpio_num_t) 13);
+        blink = new FlashingIndicator(BLINK_GPIO);
         blink->setBeatsPerMinute(120);
         blink->start();
 
