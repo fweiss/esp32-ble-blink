@@ -54,18 +54,18 @@ class MainBLEServer: public Task {
         battery = new BatteryLevel();
 
         BLEDevice::init("ESP32");
-        BLEServer* pServer = BLEDevice::createServer();
+        BLEServer* server = BLEDevice::createServer();
 
-        BLEService* pService = pServer->createService("91bad492-b950-4226-aa2b-4ede9fa42f59");
+        BLEService* service = server->createService("91bad492-b950-4226-aa2b-4ede9fa42f59");
 
-        createBatteryLevelCharacteristic(pService);
-        createHeartRateCharacteristic(pService);
+        createBatteryLevelCharacteristic(service);
+        createHeartRateCharacteristic(service);
 
-        pService->start();
+        service->start();
 
-        BLEAdvertising* pAdvertising = pServer->getAdvertising();
-        pAdvertising->addServiceUUID(BLEUUID(pService->getUUID()));
-        pAdvertising->start();
+        BLEAdvertising* advertising = server->getAdvertising();
+        advertising->addServiceUUID(BLEUUID(service->getUUID()));
+        advertising->start();
 
         ESP_LOGD(LOG_TAG, "Advertising started!");
         // todo find a better way to suspend here
@@ -73,7 +73,7 @@ class MainBLEServer: public Task {
     }
 
     void createBatteryLevelCharacteristic(BLEService* pService) {
-        BLECharacteristic* pCharacteristic = pService->createCharacteristic(
+        BLECharacteristic* characteristic = pService->createCharacteristic(
             BLEUUID(characteristicUUID),
             BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
             BLECharacteristic::PROPERTY_NOTIFY    | BLECharacteristic::PROPERTY_WRITE |
@@ -81,8 +81,8 @@ class MainBLEServer: public Task {
         );
 
         uint8_t batteryLevel = battery->getCurrentLevel(); //57;
-        pCharacteristic->setValue(&batteryLevel, sizeof(batteryLevel));
-        pCharacteristic->setCallbacks(createReadCallbacks(
+        characteristic->setValue(&batteryLevel, sizeof(batteryLevel));
+        characteristic->setCallbacks(createReadCallbacks(
             [this](BLECharacteristic* characteristic) {
                 uint8_t value = battery->toPercent(battery->getCurrentLevel());
                 characteristic->setValue(&value, 1);
@@ -91,23 +91,23 @@ class MainBLEServer: public Task {
 
         BLE2902* p2902Descriptor = new BLE2902();
         p2902Descriptor->setNotifications(true);
-        pCharacteristic->addDescriptor(p2902Descriptor);
+        characteristic->addDescriptor(p2902Descriptor);
 
         BLEUUID userUUID((uint16_t)0x2901);
         BLEDescriptor* user = new BLEDescriptor(userUUID);
         user->setValue("LiPo battery charge\0"); // note explicit null termination
-        pCharacteristic->addDescriptor(user);
+        characteristic->addDescriptor(user);
     }
     void createHeartRateCharacteristic(BLEService* service) {
         const char* characteristicUUID = "00002A92-0000-1000-8000-00805F9B34FB";
-        BLECharacteristic* pCharacteristic = service->createCharacteristic(
+        BLECharacteristic* characteristic = service->createCharacteristic(
             BLEUUID(characteristicUUID),
             BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
             BLECharacteristic::PROPERTY_NOTIFY    | BLECharacteristic::PROPERTY_WRITE |
             BLECharacteristic::PROPERTY_INDICATE
         );
 
-        pCharacteristic->setCallbacks(createWriteCallbacks(
+        characteristic->setCallbacks(createWriteCallbacks(
             [this](BLECharacteristic* characteristic) {
                 int value = characteristic->getValue()[0];
                 ESP_LOGI(LOG_TAG, "setting heart rate: %d", value);
@@ -115,13 +115,13 @@ class MainBLEServer: public Task {
         }));
 
         uint8_t heartRate = 61;
-        pCharacteristic->setValue(&heartRate, sizeof(heartRate));
+        characteristic->setValue(&heartRate, sizeof(heartRate));
 
         // Characteristic Presentation Format
         BLE2904* ble2904 = new BLE2904();
         ble2904->setFormat(BLE2904::FORMAT_UINT8);
         ble2904->setUnit(0x27af); // bpm
-        pCharacteristic->addDescriptor(ble2904);
+        characteristic->addDescriptor(ble2904);
     }
     BLECharacteristicCallbacks* createReadCallbacks(CharacteristicCallback readCallback) {
         return new Ch(readCallback, nullptr);

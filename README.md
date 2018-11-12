@@ -109,6 +109,7 @@ Devices > Show low energy devices.
  
 ## Notes and references
 It's only possible to connect one client at a time.
+See https://github.com/nkolban/esp32-snippets/issues/307
 
 ## Bluetooth specifications
 Units https://www.bluetooth.com/specifications/assigned-numbers/units
