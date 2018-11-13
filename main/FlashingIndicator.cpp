@@ -13,8 +13,6 @@ FlashingIndicator::FlashingIndicator(gpio_num_t pin) {
 
 void FlashingIndicator::run(void* data) {
     while (true) {
-        // todo switch to vTaskDelayUntil for more accurate timing
-        // reluctant to change this without a way to test
         unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
         stateForNextMillis(true, onPeriodMillis);
         stateForNextMillis(false, offPeriodMillis);
@@ -22,6 +20,8 @@ void FlashingIndicator::run(void* data) {
 }
 
 // turns it on or off for the given period without busy-blocking.
+// todo switch to vTaskDelayUntil for more accurate timing
+// reluctant to change this without a way to test
 void FlashingIndicator::stateForNextMillis(bool onOff, unsigned long millis) {
     uint32_t level = onOff ? 1 : 0;
     gpio_set_level(pin, level);
