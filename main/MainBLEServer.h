@@ -48,11 +48,11 @@ class MainBLEServer: public Task {
     FlashingIndicator* blink;
     BatteryLevel* battery;
 
-    const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
 //    const uint8_t batteryVoltagePin = 13; // A13
 
     void run(void *data) {
         ESP_LOGD(LOG_TAG, "Starting BLE work!");
+        const BLEUUID serviceUUID("91bad492-b950-4226-aa2b-4ede9fa42f59");
 
         blink = new FlashingIndicator(BLINK_GPIO);
         blink->setBeatsPerMinute(120);
@@ -63,7 +63,7 @@ class MainBLEServer: public Task {
         BLEDevice::init("ESP32");
         BLEServer* server = BLEDevice::createServer();
 
-        BLEService* service = server->createService("91bad492-b950-4226-aa2b-4ede9fa42f59");
+        BLEService* service = server->createService(serviceUUID);
 
         createBatteryLevelCharacteristic(service);
         createHeartRateCharacteristic(service);
@@ -80,6 +80,7 @@ class MainBLEServer: public Task {
     }
 
     void createBatteryLevelCharacteristic(BLEService* pService) {
+        const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
         BLECharacteristic* characteristic = pService->createCharacteristic(
             BLEUUID(characteristicUUID),
             BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
