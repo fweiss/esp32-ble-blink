@@ -70,7 +70,13 @@ class MainBLEServer: public Task {
 
         service->start();
 
+        BLEAdvertisementData advertisementData;
+        advertisementData.setManufacturerData("Prototype by feweiss@gmail.com");
+        advertisementData.setName("ESP BLE Blink"); // this works
+
         BLEAdvertising* advertising = server->getAdvertising();
+        advertising->setAdvertisementData(advertisementData);
+        advertising->setScanResponseData(advertisementData);
         advertising->addServiceUUID(BLEUUID(service->getUUID()));
         advertising->start();
 
