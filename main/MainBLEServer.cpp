@@ -1,4 +1,5 @@
 #include "MainBLEServer.h"
+#include "BLECharacteristicCallbacksHelper.h"
 
 #include "BLEDevice.h"
 #include "BLEServer.h"
@@ -62,6 +63,8 @@ void MainBLEServer::run(void *data) {
 }
 
 void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {
+    const auto& createReadCallbacks = BLECharacteristicCallbacksHelper::createReadCallbacks;
+
     const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
     BLECharacteristic* characteristic = pService->createCharacteristic(
         BLEUUID(characteristicUUID),
@@ -89,6 +92,8 @@ void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {
     characteristic->addDescriptor(user);
 }
 void MainBLEServer::createHeartRateCharacteristic(BLEService* service) {
+    const auto& createWriteCallbacks = BLECharacteristicCallbacksHelper::createWriteCallbacks;
+
     const char* characteristicUUID = "00002A92-0000-1000-8000-00805F9B34FB";
     BLECharacteristic* characteristic = service->createCharacteristic(
         BLEUUID(characteristicUUID),
@@ -112,10 +117,4 @@ void MainBLEServer::createHeartRateCharacteristic(BLEService* service) {
     ble2904->setFormat(BLE2904::FORMAT_UINT8);
     ble2904->setUnit(0x27af); // bpm
     characteristic->addDescriptor(ble2904);
-}
-BLECharacteristicCallbacks* MainBLEServer::createReadCallbacks(CharacteristicCallback readCallback) {
-    return new Ch(readCallback, nullptr);
-}
-BLECharacteristicCallbacks* MainBLEServer::createWriteCallbacks(CharacteristicCallback readCallback) {
-    return new Ch(nullptr, readCallback);
 }

@@ -21,40 +21,15 @@
 */
 #define BLINK_GPIO ((gpio_num_t)CONFIG_BLINK_GPIO)
 
-typedef std::function<void(BLECharacteristic*)> CharacteristicCallback;
-
 class MainBLEServer: public Task {
 public:
     static const char* LOG_TAG;
 
-    // helper class extension to support lambda callbacks
-    class Ch : public BLECharacteristicCallbacks {
-    public:
-        Ch(CharacteristicCallback readCallback, CharacteristicCallback writeCallback) {
-            this->readCallback = readCallback ? readCallback : nullCallback;
-            this->writeCallback = writeCallback ? writeCallback : nullCallback;
-        }
-        ~Ch() {}
-        virtual void onWrite(BLECharacteristic* characteristic) {
-            writeCallback(characteristic);
-        }
-        virtual void onRead(BLECharacteristic* characteristic) {
-            readCallback(characteristic);
-        }
-    private:
-        CharacteristicCallback readCallback;
-        CharacteristicCallback writeCallback;
-        const CharacteristicCallback nullCallback = [](BLECharacteristic*){};
-    };
-
     FlashingIndicator* blink;
     BatteryLevel* battery;
-
 
     void run(void *data);
     void createBatteryLevelCharacteristic(BLEService* pService);
 
     void createHeartRateCharacteristic(BLEService* service);
-    BLECharacteristicCallbacks* createReadCallbacks(CharacteristicCallback readCallback);
-    BLECharacteristicCallbacks* createWriteCallbacks(CharacteristicCallback readCallback);
 };
