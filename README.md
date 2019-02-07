@@ -111,6 +111,12 @@ Devices > Show low energy devices.
 It's only possible to connect one client at a time.
 See https://github.com/nkolban/esp32-snippets/issues/307
 
+### 16-bit UUIDs
+The BLEUUID constructor will take 16-bit UUIDs in place of the full 128-bit.
+For example:
+
+BLEUUID((uint16_t) 0x2A92) = BLEUUID("00002A92-0000-1000-8000-00805F9B34FB");
+
 ### BT service trace
 - BLEService::start()
 - ::esp\_ble\_gatts\_start\_service()

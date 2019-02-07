@@ -65,9 +65,9 @@ void MainBLEServer::start() {
 void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {
     const auto& createReadCallbacks = BLECharacteristicCallbacksHelper::createReadCallbacks;
 
-    const char* characteristicUUID = "00002A19-0000-1000-8000-00805F9B34FB";
+    const uint16_t batteryLevelCharacteristicUUID = 0x2a19;
     BLECharacteristic* characteristic = pService->createCharacteristic(
-        BLEUUID(characteristicUUID),
+        BLEUUID(batteryLevelCharacteristicUUID),
         BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
         BLECharacteristic::PROPERTY_NOTIFY    | BLECharacteristic::PROPERTY_WRITE |
         BLECharacteristic::PROPERTY_INDICATE
@@ -94,9 +94,9 @@ void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {
 void MainBLEServer::createHeartRateCharacteristic(BLEService* service) {
     const auto& createWriteCallbacks = BLECharacteristicCallbacksHelper::createWriteCallbacks;
 
-    const char* characteristicUUID = "00002A92-0000-1000-8000-00805F9B34FB";
+    const uint16_t restingHeartRateCharacteristicUUID = 0x2a92;
     BLECharacteristic* characteristic = service->createCharacteristic(
-        BLEUUID(characteristicUUID),
+        BLEUUID(restingHeartRateCharacteristicUUID),
         BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
         BLECharacteristic::PROPERTY_NOTIFY    | BLECharacteristic::PROPERTY_WRITE |
         BLECharacteristic::PROPERTY_INDICATE
