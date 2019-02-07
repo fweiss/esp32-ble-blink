@@ -27,7 +27,7 @@ const char* MainBLEServer::LOG_TAG = "SampleServer";
 typedef std::function<void(BLECharacteristic*)> CharacteristicCallback;
 
 
-void MainBLEServer::run(void *data) {
+void MainBLEServer::start() {
     ESP_LOGD(LOG_TAG, "Starting BLE work!");
     const BLEUUID serviceUUID("91bad492-b950-4226-aa2b-4ede9fa42f59");
 
@@ -59,7 +59,7 @@ void MainBLEServer::run(void *data) {
 
     ESP_LOGD(LOG_TAG, "Advertising started!");
     // todo find a better way to suspend here
-    delay(1000000);
+//    delay(1000000);
 }
 
 void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {

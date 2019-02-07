@@ -21,14 +21,14 @@
 */
 #define BLINK_GPIO ((gpio_num_t)CONFIG_BLINK_GPIO)
 
-class MainBLEServer: public Task {
+class MainBLEServer {
 public:
     static const char* LOG_TAG;
 
     FlashingIndicator* blink;
     BatteryLevel* battery;
 
-    void run(void *data);
+    void start();
     void createBatteryLevelCharacteristic(BLEService* pService);
 
     void createHeartRateCharacteristic(BLEService* service);

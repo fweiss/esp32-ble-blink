@@ -111,6 +111,15 @@ Devices > Show low energy devices.
 It's only possible to connect one client at a time.
 See https://github.com/nkolban/esp32-snippets/issues/307
 
+### BT service trace
+- BLEService::start()
+- ::esp\_ble\_gatts\_start\_service()
+- btc\_transfer\_context()
+- btc\_task\_post
+- xQueueSend(xBtcQueue, ...)
+- xQueueReceive
+- bt\_call
+
 ## Bluetooth specifications
 Units https://www.bluetooth.com/specifications/assigned-numbers/units
 
