@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 typedef std::function<void(BLECharacteristic*)> CharacteristicCallback;
 
 // helper class extension to support lambda callbacks

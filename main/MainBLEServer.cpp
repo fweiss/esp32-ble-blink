@@ -1,5 +1,4 @@
 #include "MainBLEServer.h"
-#include "BLECharacteristicCallbacksHelper.h"
 
 #include "BLEDevice.h"
 #include "BLEServer.h"
@@ -23,9 +22,6 @@
 #define BLINK_GPIO ((gpio_num_t)CONFIG_BLINK_GPIO)
 
 const char* MainBLEServer::LOG_TAG = "SampleServer";
-
-typedef std::function<void(BLECharacteristic*)> CharacteristicCallback;
-
 
 void MainBLEServer::start() {
     ESP_LOGD(LOG_TAG, "Starting BLE work!");
@@ -58,27 +54,24 @@ void MainBLEServer::start() {
     advertising->start();
 
     ESP_LOGD(LOG_TAG, "Advertising started!");
-    // todo find a better way to suspend here
-//    delay(1000000);
 }
 
 void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {
-    const auto& createReadCallbacks = BLECharacteristicCallbacksHelper::createReadCallbacks;
-
     const uint16_t batteryLevelCharacteristicUUID = 0x2a19;
+
     BLECharacteristic* characteristic = pService->createCharacteristic(
         BLEUUID(batteryLevelCharacteristicUUID),
         BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
-        BLECharacteristic::PROPERTY_NOTIFY    | BLECharacteristic::PROPERTY_WRITE |
+        BLECharacteristic::PROPERTY_NOTIFY    | //BLECharacteristic::PROPERTY_WRITE |
         BLECharacteristic::PROPERTY_INDICATE
     );
 
-    uint8_t batteryLevel = battery->getCurrentLevel(); //57;
-    characteristic->setValue(&batteryLevel, sizeof(batteryLevel));
+//    uint8_t batteryLevel = battery->getCurrentLevel(); //57;
+//    characteristic->setValue(&batteryLevel, sizeof(batteryLevel));
     characteristic->setCallbacks(createReadCallbacks(
         [this](BLECharacteristic* characteristic) {
             uint8_t value = battery->toPercent(battery->getCurrentLevel());
-            characteristic->setValue(&value, 1);
+            characteristic->setValue(&value, sizeof(value));
             ESP_LOGI(LOG_TAG, "battery level: %d", value);
     }));
 
@@ -92,9 +85,8 @@ void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {
     characteristic->addDescriptor(user);
 }
 void MainBLEServer::createHeartRateCharacteristic(BLEService* service) {
-    const auto& createWriteCallbacks = BLECharacteristicCallbacksHelper::createWriteCallbacks;
-
     const uint16_t restingHeartRateCharacteristicUUID = 0x2a92;
+
     BLECharacteristic* characteristic = service->createCharacteristic(
         BLEUUID(restingHeartRateCharacteristicUUID),
         BLECharacteristic::PROPERTY_BROADCAST | BLECharacteristic::PROPERTY_READ  |
@@ -109,8 +101,8 @@ void MainBLEServer::createHeartRateCharacteristic(BLEService* service) {
             blink->setBeatsPerMinute(value);
     }));
 
-    uint8_t heartRate = 61;
-    characteristic->setValue(&heartRate, sizeof(heartRate));
+//    uint8_t heartRate = 61;
+//    characteristic->setValue(&heartRate, sizeof(heartRate));
 
     // Characteristic Presentation Format
     BLE2904* ble2904 = new BLE2904();

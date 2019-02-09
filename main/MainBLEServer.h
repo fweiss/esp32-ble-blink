@@ -9,12 +9,12 @@
 #include <string>
 #include <Task.h>
 
+#include "BLECharacteristicCallbacksHelper.h"
+
 #include "FlashingIndicator.h"
 #include "BatteryLevel.h"
 
 #include "sdkconfig.h"
-
-#include <functional>
 
 /* Can run 'make menuconfig' to choose the GPIO to blink,
    or you can edit the following line and set a number here.
@@ -32,4 +32,8 @@ public:
     void createBatteryLevelCharacteristic(BLEService* pService);
 
     void createHeartRateCharacteristic(BLEService* service);
+private:
+    // alias shortcuts
+    static constexpr auto& createReadCallbacks = BLECharacteristicCallbacksHelper::createReadCallbacks;
+    static constexpr auto& createWriteCallbacks = BLECharacteristicCallbacksHelper::createWriteCallbacks;
 };
