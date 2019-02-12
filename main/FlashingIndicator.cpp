@@ -25,17 +25,13 @@ void FlashingIndicator::run(void* data) {
 // todo switch to vTaskDelayUntil for more accurate timing
 // reluctant to change this without a way to test
 void FlashingIndicator::stateForNextMillis(bool onOff, unsigned long millis) {
-    logCurrrentEvent(onOff);
+    logEvent(onOff);
     uint32_t level = onOff ? 1 : 0;
     gpio_set_level(pin, level);
     vTaskDelay(millis / portTICK_PERIOD_MS);
 }
 
-void FlashingIndicator::setBeatsPerMinute(unsigned int bpm) {
-    this->beatsPerMinute = bpm;
-}
-
-void FlashingIndicator::logCurrentEvent(boolean onOff) {
+void FlashingIndicator::logEvent(bool onOff) {
     if (onOff) {
         ESP_LOGI("FlashingIndicator", "ON");
     } else {

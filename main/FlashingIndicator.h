@@ -10,12 +10,14 @@ public:
 
     gpio_num_t pin;
     const unsigned long onPeriodMillis = 20;
-    unsigned long beatsPerMinute = 80;
-    void setBeatsPerMinute(unsigned int bpm);
+    uint16_t beatsPerMinute = 80;
+
+    void setBeatsPerMinute(uint16_t beatsPerMinute) { this->beatsPerMinute = beatsPerMinute; };
+    uint16_t getBeatsPerMinute() { return this->beatsPerMinute; }
 
     virtual void run(void* data) override;
 
-    void logEvent(boolean onOff);
+    void logEvent(bool onOff);
 protected:
     void stateForNextMillis(bool onOff, unsigned long millis);
 };

@@ -94,12 +94,19 @@ void MainBLEServer::createHeartRateCharacteristic(BLEService* service) {
         BLECharacteristic::PROPERTY_INDICATE
     );
 
-    characteristic->setCallbacks(createWriteCallbacks(
+    characteristic->setCallbacks(createReadWriteCallbacks(
         [this](BLECharacteristic* characteristic) {
-            int value = characteristic->getValue()[0];
-            ESP_LOGI(LOG_TAG, "setting heart rate: %d", value);
+            uint16_t value = blink->getBeatsPerMinute();
+            characteristic->setValue(value);
+            ESP_LOGI(LOG_TAG, "reading heart rate: %d", value);
+        },
+        [this](BLECharacteristic* characteristic) {
+            // todo get 16 bits
+            uint16_t value = characteristic->getValue()[0];
             blink->setBeatsPerMinute(value);
-    }));
+            ESP_LOGI(LOG_TAG, "setting heart rate: %d", value);
+        }
+    ));
 
 //    uint8_t heartRate = 61;
 //    characteristic->setValue(&heartRate, sizeof(heartRate));

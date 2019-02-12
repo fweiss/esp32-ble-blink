@@ -21,8 +21,11 @@ public:
     static BLECharacteristicCallbacks* createReadCallbacks(CharacteristicCallback readCallback) {
         return new BLECharacteristicCallbacksHelper(readCallback, nullptr);
     }
-    static BLECharacteristicCallbacks* createWriteCallbacks(CharacteristicCallback readCallback) {
-        return new BLECharacteristicCallbacksHelper(nullptr, readCallback);
+    static BLECharacteristicCallbacks* createWriteCallbacks(CharacteristicCallback writeCallback) {
+        return new BLECharacteristicCallbacksHelper(nullptr, writeCallback);
+    }
+    static BLECharacteristicCallbacks* createReadWriteCallbacks(CharacteristicCallback readCallback, CharacteristicCallback writeCallback) {
+        return new BLECharacteristicCallbacksHelper(readCallback, writeCallback);
     }
 
 private:

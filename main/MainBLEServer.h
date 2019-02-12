@@ -36,4 +36,5 @@ private:
     // alias shortcuts
     static constexpr auto& createReadCallbacks = BLECharacteristicCallbacksHelper::createReadCallbacks;
     static constexpr auto& createWriteCallbacks = BLECharacteristicCallbacksHelper::createWriteCallbacks;
+    static constexpr auto& createReadWriteCallbacks = BLECharacteristicCallbacksHelper::createReadWriteCallbacks;
 };
