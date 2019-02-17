@@ -14,10 +14,27 @@ FlashingIndicator::FlashingIndicator(gpio_num_t pin) {
 }
 
 void FlashingIndicator::run(void* data) {
-    while (true) {
+    if (false) {
+        while (true) {
+            unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
+            stateForNextMillis(true, onPeriodMillis);
+            stateForNextMillis(false, offPeriodMillis);
+        }
+    } else {
         unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
-        stateForNextMillis(true, onPeriodMillis);
-        stateForNextMillis(false, offPeriodMillis);
+        TickType_t basePeriodWakeTime = xTaskGetTickCount();
+        TickType_t onTime = onPeriodMillis / portTICK_PERIOD_MS;
+        TickType_t offTime= offPeriodMillis / portTICK_PERIOD_MS;
+        while (true) {
+            gpio_set_level(pin, 1);
+            logEvent(true);
+            TickType_t onWakeTime = basePeriodWakeTime;
+            vTaskDelayUntil(&onWakeTime, onTime);
+
+            gpio_set_level(pin, 0);
+            logEvent(false);
+            vTaskDelayUntil(&basePeriodWakeTime, onTime + offTime);
+        }
     }
 }
 
