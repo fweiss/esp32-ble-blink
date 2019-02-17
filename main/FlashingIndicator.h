@@ -20,4 +20,6 @@ public:
     void logEvent(bool onOff);
 protected:
     void stateForNextMillis(bool onOff, unsigned long millis);
+private:
+    void runWithDelayUntil();
 };
