@@ -29,7 +29,7 @@ void MainBLEServer::start() {
 
     try {
         blink = new FlashingIndicator(BLINK_GPIO);
-        blink->setBeatsPerMinute(120);
+        blink->setBeatsPerMinute(60);
         blink->start();
 
         battery = new BatteryLevel();

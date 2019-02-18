@@ -23,7 +23,7 @@ void FlashingIndicator::setBeatsPerMinute(uint16_t beatsPerMinute) {
 }
 
 void FlashingIndicator::run(void* data) {
-    if (true) {
+    if (false) {
         while (true) {
             unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
             stateForNextMillis(true, onPeriodMillis);
@@ -34,11 +34,13 @@ void FlashingIndicator::run(void* data) {
     }
 }
 
+// note that vTaskDelayUntil only provides 10 ms resolution
+// using a hardware timer would provide finer resolution and reduce task switching overhead
 void FlashingIndicator::runWithDelayUntil() {
-    unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
+    unsigned long basePeriodMillis = 60 * 1000 / beatsPerMinute;
     TickType_t basePeriodWakeTime = xTaskGetTickCount();
     TickType_t onTime = onPeriodMillis / portTICK_PERIOD_MS;
-    TickType_t offTime= offPeriodMillis / portTICK_PERIOD_MS;
+    TickType_t basePeriodTicks = basePeriodMillis / portTICK_PERIOD_MS;
     while (true) {
         gpio_set_level(pin, 1);
         logEvent(true);
@@ -47,7 +49,9 @@ void FlashingIndicator::runWithDelayUntil() {
 
         gpio_set_level(pin, 0);
         logEvent(false);
-        vTaskDelayUntil(&basePeriodWakeTime, onTime + offTime);
+        ESP_LOGI("FlashingIndicator", "before %d %d", basePeriodWakeTime, portTICK_PERIOD_MS);
+        vTaskDelayUntil(&basePeriodWakeTime, basePeriodTicks);
+        ESP_LOGI("FlashingIndicator", "after %d", basePeriodWakeTime);
     }
 }
 

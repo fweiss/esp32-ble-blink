@@ -9,7 +9,7 @@ public:
     virtual ~FlashingIndicator() {};
 
     gpio_num_t pin;
-    const unsigned long onPeriodMillis = 20;
+    const unsigned long onPeriodMillis = 500;
     uint16_t beatsPerMinute = 80;
 
     void setBeatsPerMinute(uint16_t beatsPerMinute);
