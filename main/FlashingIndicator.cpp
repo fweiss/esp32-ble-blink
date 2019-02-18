@@ -5,6 +5,7 @@
 #include "freertos/task.h"
 #include <esp_log.h>
 #include <string>
+#include <stdexcept>
 #include "sdkconfig.h"
 
 FlashingIndicator::FlashingIndicator(gpio_num_t pin) {
@@ -13,8 +14,16 @@ FlashingIndicator::FlashingIndicator(gpio_num_t pin) {
     gpio_set_direction(pin, GPIO_MODE_OUTPUT);
 }
 
+void FlashingIndicator::setBeatsPerMinute(uint16_t beatsPerMinute) {
+    unsigned long periodMillis = 60 * 1000 / beatsPerMinute;
+    if (periodMillis < onPeriodMillis * 2) {
+        throw std::invalid_argument("beats per minute too high for pulse width");
+    }
+    this->beatsPerMinute = beatsPerMinute;
+}
+
 void FlashingIndicator::run(void* data) {
-    if (false) {
+    if (true) {
         while (true) {
             unsigned long offPeriodMillis = 60 * 1000 / beatsPerMinute;
             stateForNextMillis(true, onPeriodMillis);

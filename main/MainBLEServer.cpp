@@ -27,33 +27,38 @@ void MainBLEServer::start() {
     ESP_LOGD(LOG_TAG, "Starting BLE work!");
     const BLEUUID serviceUUID("91bad492-b950-4226-aa2b-4ede9fa42f59");
 
-    blink = new FlashingIndicator(BLINK_GPIO);
-    blink->setBeatsPerMinute(120);
-    blink->start();
+    try {
+        blink = new FlashingIndicator(BLINK_GPIO);
+        blink->setBeatsPerMinute(120);
+        blink->start();
 
-    battery = new BatteryLevel();
+        battery = new BatteryLevel();
 
-    BLEDevice::init("ESP32");
-    BLEServer* server = BLEDevice::createServer();
+        BLEDevice::init("ESP32");
+        BLEServer* server = BLEDevice::createServer();
 
-    BLEService* service = server->createService(serviceUUID);
+        BLEService* service = server->createService(serviceUUID);
 
-    createBatteryLevelCharacteristic(service);
-    createHeartRateCharacteristic(service);
+        createBatteryLevelCharacteristic(service);
+        createHeartRateCharacteristic(service);
 
-    service->start();
+        service->start();
 
-    BLEAdvertisementData advertisementData;
-    advertisementData.setManufacturerData("Prototype by feweiss@gmail.com");
-    advertisementData.setName("ESP BLE Blink"); // this works
+        BLEAdvertisementData advertisementData;
+        advertisementData.setManufacturerData("Prototype by feweiss@gmail.com");
+        advertisementData.setName("ESP BLE Blink"); // this works
 
-    BLEAdvertising* advertising = server->getAdvertising();
-    advertising->setAdvertisementData(advertisementData);
-    advertising->setScanResponseData(advertisementData);
-    advertising->addServiceUUID(BLEUUID(service->getUUID()));
-    advertising->start();
+        BLEAdvertising* advertising = server->getAdvertising();
+        advertising->setAdvertisementData(advertisementData);
+        advertising->setScanResponseData(advertisementData);
+        advertising->addServiceUUID(BLEUUID(service->getUUID()));
+        advertising->start();
 
-    ESP_LOGD(LOG_TAG, "Advertising started!");
+        ESP_LOGD(LOG_TAG, "Advertising started!");
+    } catch (const std::invalid_argument &e) {
+        ESP_LOGE(LOG_TAG, "could not start application: %s", e.what());
+    }
+    ESP_LOGI(LOG_TAG, "main() exiting");
 }
 
 void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {

@@ -12,7 +12,7 @@ public:
     const unsigned long onPeriodMillis = 20;
     uint16_t beatsPerMinute = 80;
 
-    void setBeatsPerMinute(uint16_t beatsPerMinute) { this->beatsPerMinute = beatsPerMinute; };
+    void setBeatsPerMinute(uint16_t beatsPerMinute);
     uint16_t getBeatsPerMinute() { return this->beatsPerMinute; }
 
     virtual void run(void* data) override;
