@@ -40,6 +40,22 @@ https://www.bluetooth.com/specifications/gatt/characteristics
 
 https://www.oreilly.com/library/view/getting-started-with/9781491900550/ch04.html
 
+### Issues
+Although this library simplifies the development of BLE applications, it has some limitatons:
+- registering read and write callbacks is clumsy
+- the read and write callback wrappers do not provide for error cases
+
+In the case of the callback registration:
+- both read and write callbacks are registered together, not separately
+- the read and write callbacks need tyo be created via subclassing - a more natural and flexible
+approach with C++11 would be lamdba expression
+
+In the case of a write that attempts an invalid value, the library always provides the response ``ESP_GATT_OK``.
+We'd like to response with ``ESP_GATT_ERROR``, or ``ESP_GATT_ILLEGAL_PARAMETER``, or ``ESP_GATT_OUT_OF_RANGE``
+
+See https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/bluetooth/esp_gatt_defs.html
+and https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/BLECharacteristic.cpp
+
 ## BLE clients
 Besides writing a custom client, there are many generic clients for testing a BLE server. They are available for either desktop or mobile.
 

@@ -36,6 +36,8 @@ void MainBLEServer::start() {
 
         BLEDevice::init("ESP32");
         BLEServer* server = BLEDevice::createServer();
+        MainBLEServer::NotifyServerCallbacks *callbacks = new MainBLEServer::NotifyServerCallbacks(*this);
+        server->setCallbacks(callbacks);
 
         BLEService* service = server->createService(serviceUUID);
 
@@ -88,6 +90,11 @@ void MainBLEServer::createBatteryLevelCharacteristic(BLEService* pService) {
     BLEDescriptor* user = new BLEDescriptor(userUUID);
     user->setValue("LiPo battery charge\0"); // note explicit null termination
     characteristic->addDescriptor(user);
+
+    notifyTask = new NotifyTask(characteristic, battery);
+    notifyTask->setStackSize(8000);
+    notifyTask->start();
+    ESP_LOGI(LOG_TAG, "notify task started");
 }
 void MainBLEServer::createHeartRateCharacteristic(BLEService* service) {
     const uint16_t restingHeartRateCharacteristicUUID = 0x2a92;

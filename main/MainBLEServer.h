@@ -13,6 +13,7 @@
 
 #include "FlashingIndicator.h"
 #include "BatteryLevel.h"
+#include "NotifyTask.h"
 
 #include "sdkconfig.h"
 
@@ -32,7 +33,24 @@ public:
     void createBatteryLevelCharacteristic(BLEService* pService);
 
     void createHeartRateCharacteristic(BLEService* service);
+
 private:
+    NotifyTask *notifyTask;
+
+    class NotifyServerCallbacks : public BLEServerCallbacks {
+    public:
+        const MainBLEServer &app;
+        explicit NotifyServerCallbacks(const MainBLEServer &app) : app(app) {}
+        void onConnect(BLEServer *server) {
+            ESP_LOGI("server callback", "starting notify task");
+            app.notifyTask->start();
+        }
+        void onDisconnect(BLEServer *server) {
+            ESP_LOGI("server callback", "stopping notify task");
+            app.notifyTask->stop();
+        }
+    };
+
     // alias shortcuts
     static constexpr auto& createReadCallbacks = BLECharacteristicCallbacksHelper::createReadCallbacks;
     static constexpr auto& createWriteCallbacks = BLECharacteristicCallbacksHelper::createWriteCallbacks;
